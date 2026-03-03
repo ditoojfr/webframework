@@ -1,9 +1,19 @@
 <?php
 
-use App\Http\Controllers\ManagementUserController;
-use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ManagementUsercontroller;
+use App\Http\Controllers\SessionController;
+use App\Http\Middleware\CheckAge;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\backend\PengalamanKerjaController;
+use App\Http\Controllers\backend\PendidikanController;
+use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\CobaController;
+use App\Http\Controllers\UploadController;
+use App\Http\Controllers\ApiPendidikanController;
 
 //Acara 3
 Route::get('/index', function () {
@@ -104,6 +114,57 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 
 //Acara12
-Route::get('admin/profil', function () {
-    return "Ini halaman profil admin.";
+Route::get('/admin/profile1', function () {
+
 })->middleware('auth');
+Route::get('/1', function () {
+
+})->middleware('first', 'second');
+Route::get('/admin/profile2', function () {
+
+})->middleware(CheckAge::class);
+
+Route::get('/2', function () {
+
+})->middleware('web');
+Route::group(['middleware' => ['web']], function () { });
+ROute::middleware(['web', 'subscribed'])->group(function () {
+
+});
+Route::put('post/{id}', function () {
+
+})->middleware('role:editor');
+
+Route::group(['namespace' => 'App\Http\Controllers\backend'], function () {
+    Route::resource('dash', DashboardController::class);
+    Route::resource('pengalaman_kerja', PengalamanKerjaController::class);
+    Route::resource('pendidikan', PendidikanController::class);
+});
+Route::get('/session/create', [SessionController::class, 'create']);
+Route::get('/session/show', [SessionController::class, 'show']);
+Route::get('/session/delete', [SessionController::class, 'delete']);
+
+Route::get('/pegawai/{nama}', [PegawaiController::class, 'index']);
+
+Route::get('/formulir', [PegawaiController::class, 'formulir']);
+Route::post('/formulir/proses', [PegawaiController::class, 'proses']);
+
+Route::get('/cobaerror/{nama?}', [CobaController::class, 'index']);
+
+Route::get('/upload', [UploadController::class, 'upload'])->name('upload');
+
+Route::post('/upload/proses', [UploadController::class, 'proses_upload'])->name('upload.proses');
+
+Route::post('/upload/resize', [UploadController::class, 'resize_upload'])->name('upload.resize');
+
+Route::get('/dropzone', [UploadController::class, 'dropzone'])->name('dropzone');
+Route::post('/dropzone/store', [UploadController::class, 'dropzone_store'])->name('dropzone.store');
+Route::get('/pdf_upload', [UploadController::class, 'pdf_upload'])->name('pdf.upload');
+Route::post('/pdf/store', [UploadController::class, 'pdf_store'])->name('pdf.store');
+
+
+Route::get('/api/pendidikan', [ApiPendidikanController::class, 'getAll']);
+Route::get('/api/pendidikan/{id}', [ApiPendidikanController::class, 'getPen']);
+Route::post('/api/pendidikan', [ApiPendidikanController::class, 'createPen']);
+Route::put('/api/pendidikan/{id}', [ApiPendidikanController::class, 'updatePen']);
+Route::delete('/api/pendidikan/{id}', [ApiPendidikanController::class, 'deletePen']);
